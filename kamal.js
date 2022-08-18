@@ -1,111 +1,94 @@
 bill = [
-    bill1 = { a : 1000,b : 2000,c : 1000},
-    bill2 = {a : 1000,b : 250,c : 750,d : 1250}, 
-    bill3 ={a : 3000,b : 100,d : 200}
+    bill1 = {a : 2000,b : 200,c : 1000},
+    bill2 = {a : 1500,b : 0,c : 0,d : 1300},
+    bill3 = {x : 1000,y : 0}, 
   ]
-  //Function For finding  Bill Sum(separately)
-  const sumfind = (a) =>{
-      let s = Object.values(bill[a])
-      let k = 0
-      for(i of s){
-          k = k + i}
-      return k}   
-  let bill1_sum = (sumfind(0))  
-  let bill2_sum = (sumfind(1))  
-  let bill3_sum = (sumfind(2))  
-  let bill1_average =  (bill1_sum / Object.keys(bill[0]).length) 
-  let bill2_average =  (bill2_sum / Object.keys(bill[1]).length) 
-  let bill3_average =  (bill3_sum / Object.keys(bill[2]).length) 
-  //Function to find The remaining balance After average tally (Separately)
-  const remaining = (x,avei) =>{
-          x = x - 1 
-          let k1     = Object.keys(bill[x])                 
-          let v1     = Object.values(bill[x])               
-          var bal = {}
-          for (var i = 0;i<k1.length;i++){                 
-              bal[k1[i]]= v1[i] - avei
-          }
-          return bal}    
-  let bill1_balance = (remaining(1,bill1_average))   
-  let bill2_balance = (remaining(2,bill2_average))   
-  let bill3_balance = (remaining(3,bill3_average))  
-  //Function for Merging All 3 Bills
-  function combine(a,b){
-  let c = {}
-  for (j in b){
-      if (j in a){
-          a[j]=a[j]+b[j]
-      }
-      else{
-          a[j]=b[j]
-      }
-  }return a }   
-  let bill1nd2 =(combine(bill1_balance,bill2_balance))
-  let bill_pending =(combine(bill1nd2,bill3_balance))
-  //Function for Sorting the bill Share(From Who doesn't paid to Who paid extra)and Removing Those Who paid correct share
-  function sorting(x){
-      d = {}       
-      arr = []
-      for(i in x){ 
-          if(x[i] != 0){
-           arr.push(x[i]) }   
-          else{
-             m = 1
-           } }          
+  balance = {}
+  //Looping Every element to get a Single object of balance amounts and merging the users (what they given - average)
+  for (billNo = 0; billNo < bill.length; billNo++) {
+   let paidAmount = Object.values(bill[billNo]);
+   let paidBy = Object.keys(bill[billNo]);
+    //Finding the Sum of Elements in each object
+        sumOfbill = 0;
+        for (value of paidAmount) {
+            sumOfbill = sumOfbill + value;}
+            elementsInbill = paidAmount.length;
+            //finding the Average of each elements  
+            averageOfbill = sumOfbill / elementsInbill;
+            //taking paid amount and subtract it from average
+                var merge = {}
+                for (var billNumber = 0; billNumber < paidBy.length; billNumber++) {
+                    originalminusAverage = paidAmount[billNumber] - averageOfbill
+                    if(originalminusAverage!=0){
+                    merge[paidBy[billNumber]] = originalminusAverage ;}
+                }
+            //Merging all the users and their Amount_owed in a single Object 
+                    for(paidBy in merge){
+                        if(!(paidBy in balance)){ balance[paidBy] = merge[paidBy]}
+                        else{ balance[paidBy] = balance[paidBy]+merge[paidBy]}
+                    }
+  }
+  
+  //Sorting the single object of Amount_owed by Amount_owed
+  function sorting(object){
+      sortedObject = {}      
+      amountVowed = []
+      for(paidBy in object){
+          if(object[paidBy] != 0){
+         amountVowed.push(object[paidBy]) }  
+         }          
   
               function st(a,b){
               return(a-b)}
-              arr = arr.sort(st)
-              for(j of arr){
-                  for(k in x){
-                       if(j == x[k]){
-                          d[k] = x[k]}}}
-          return d}   
-  billtot = (sorting(bill_pending))
+           amountVowed = amountVowed.sort(st)
+              for(j of amountVowed){
+                  for(k in object){
+                       if(j == object[k]){
+                          sortedObject[k] = object[k]}}}
+          return sortedObject}  
+  billtotal = (sorting(balance))
   //Function For Return Who Should pay Whom
-  const BillSplit =(x) =>{
-     let d1 = {}       //one object for positive values
-     let d2 = {}      // one object for negative value
-     let arr = []
-     let arr2 = []
-      for(i in x){
-              if(x[i] > 0){
-                  arr.push(x[i])
-                  for(j of arr){
-                  for(k in x){
-                  if(j == x[k]){
-                      d1[k] = x[k]}}}
-              }
+  const BillSplit =(Bill) =>{
+     let peoplePaid_unsort = {}        //one object for positive values  = People to getback and the amount they should get back
+     let peopleOwed = {}              // one object for negative value   = People Owed and how much the owed
+     let paidAmount = []
+     let owedAmount = []
+    for(amount in Bill){
+              if(Bill[amount] > 0){
+                    paidAmount.push(Bill[amount])
+                    for(Amount of paidAmount){
+                        for(people in Bill){
+                            if(Amount == Bill[people]){peoplePaid_unsort[people] = Bill[people]}}}}
               else{
-                  arr2.push(x[i])
-                  for(j of arr2){
-                  for(k in x){
-                  if(j == x[k]){
-                      d2[k] = x[k]}}}
-                  }
-      }
-      x= {}   //Sorting the Positive Values(Person who needs to get money from who doesn't paid Corrct Share)
-      const revb1 = Object.keys(d1).reverse();
+                  owedAmount.push(Bill[amount])
+                  for(Amount of owedAmount){
+                    for(people in Bill){
+                        if(Amount == Bill[people]){
+                            peopleOwed[people] = Bill[people]}}}}}
+      //Sorting one object for positive values  = People to getback and the amount they should get back                      
+      peoplePaid = {}  
+      const revb1 = Object.keys(peoplePaid_unsort).reverse();
       revb1.forEach(key =>{
-      x[key] = d1[key]})
-      y = d2
-      for(i in x){
-           for(j in y){
-               if(x[i] != 0 & y[j] !=0 &x[i]< Math.abs(y[j])){
-                   console.log(`${j} has to pay,Rupees : ${x[i].toFixed(2)} to ${i}`)
-                   end = y[j] + x[i]
-                   y[j] = end
-                   x[i] = 0
+      peoplePaid[key] = peoplePaid_unsort[key]})
+      for(paid_Amount in peoplePaid){
+           for(owed_Amount in peopleOwed){
+            if(Math.round(Math.abs(peoplePaid[paid_Amount])) != 0 & Math.round(Math.abs(peopleOwed[owed_Amount])) != 0){
+              if(peoplePaid[paid_Amount]< Math.abs(peopleOwed[owed_Amount])){
+                   console.log(`${owed_Amount} has to pay,Rupees : ${peoplePaid[paid_Amount].toFixed(2)} to ${paid_Amount}`)
+                   end = peopleOwed[owed_Amount] + peoplePaid[paid_Amount]
+                   peopleOwed[owed_Amount] = end
+                   peoplePaid[paid_Amount] = 0
                }
-               else if(x[i] != 0 & y[j] !=0&x[i]>Math.abs(y[j])){
-                  console.log(`${j} has to pay, Rupees: ${Math.abs(y[j].toFixed(2))} to ${i}`)
-                  end = y[j]+x[i]
-                  y[j] = 0
-                  x[i] = end}
-              else if(x[i] != 0 & y[j] !=0 & x[i] == Math.abs(y[j])){
-                  console.log(`${j} has to pay,Rupees: ${x[i].toFixed(2)} to ${i}`)
-                 x[i] = 0
-                 y[j] = 0}}}
+               else if(peoplePaid[paid_Amount]>Math.abs(peopleOwed[owed_Amount])){
+                  console.log(`${owed_Amount} has to pay, Rupees: ${Math.abs(peopleOwed[owed_Amount].toFixed(2))} to ${paid_Amount}`)
+                  end = peopleOwed[owed_Amount]+peoplePaid[paid_Amount]
+                  peopleOwed[owed_Amount] = 0
+                  peoplePaid[paid_Amount] = end
+                }
+              else if(peoplePaid[paid_Amount] == Math.abs(peopleOwed[owed_Amount])){
+                console.log(`${owed_Amount} has to pay,Rupees: ${peoplePaid[paid_Amount].toFixed(2)} to ${paid_Amount}`)
+                 peoplePaid[paid_Amount] = 0
+                 peopleOwed[owed_Amount] = 0}}}}
   }
-  console.log("******************************* Bill Splitting ************************************")
-  BillSplit(billtot)
+  console.log("******************************* Bill Splitter ************************************")
+  BillSplit(billtotal)
